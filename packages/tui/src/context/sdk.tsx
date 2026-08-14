@@ -35,7 +35,15 @@ export const { use: useSDK, provider: SDKProvider } = createSimpleContext({
     const handlers = new Set<(event: GlobalEvent) => void>()
     const emitter = {
       emit(_type: "event", event: GlobalEvent) {
-        for (const handler of handlers) handler(event)
+        // kilocode_change start
+        for (const handler of handlers) {
+          try {
+            handler(event)
+          } catch (err) {
+            console.error("tui event handler failed", { type: event.payload.type, err })
+          }
+        }
+        // kilocode_change end
       },
       on(_type: "event", handler: (event: GlobalEvent) => void) {
         handlers.add(handler)
@@ -60,7 +68,13 @@ export const { use: useSDK, provider: SDKProvider } = createSimpleContext({
       // Batch all event emissions so all store updates result in a single render
       batch(() => {
         for (const event of events) {
-          emitter.emit("event", event)
+          // kilocode_change start
+          try {
+            emitter.emit("event", event)
+          } catch (err) {
+            console.error("tui event handler failed", { type: event.payload.type, err })
+          }
+          // kilocode_change end
         }
       })
     }
