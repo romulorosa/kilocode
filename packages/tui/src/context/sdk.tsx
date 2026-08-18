@@ -68,13 +68,7 @@ export const { use: useSDK, provider: SDKProvider } = createSimpleContext({
       // Batch all event emissions so all store updates result in a single render
       batch(() => {
         for (const event of events) {
-          // kilocode_change start
-          try {
-            emitter.emit("event", event)
-          } catch (err) {
-            console.error("tui event handler failed", { type: event.payload.type, err })
-          }
-          // kilocode_change end
+          emitter.emit("event", event)
         }
       })
     }
